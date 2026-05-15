@@ -34,9 +34,6 @@ export class User {
   @Column()
   name: string;
 
-  @Column({ type: 'text', nullable: true })
-  avatarUrl: string | null;
-
   @Column({
     type: 'jsonb',
     default: () => `'${JSON.stringify(DEFAULT_NOTIFICATION_PREFERENCES)}'::jsonb`,

@@ -49,7 +49,6 @@ export class UsersService {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     if (!user) throw new NotFoundException('User not found');
     if (dto.name !== undefined) user.name = dto.name;
-    if (dto.avatarUrl !== undefined) user.avatarUrl = dto.avatarUrl ?? null;
     return this.usersRepository.save(user);
   }
 

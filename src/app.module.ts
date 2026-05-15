@@ -1,36 +1,46 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 import { OrdersModule } from './orders/orders.module';
 import { NotificationsModule } from './notifications/notifications.module';
-import { ScheduleModule } from '@nestjs/schedule';
 import { SavedItemsModule } from './saved-items/saved-items.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get('DATABASE_HOST'),
-        port: +config.get('DATABASE_PORT'),
-        username: config.get('DATABASE_USER'),
-        password: config.get('DATABASE_PASSWORD'),
-        database: config.get('DATABASE_NAME'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true, // ВНИМАНИЕ: только для разработки!
-      }),
+      useFactory: (config: ConfigService): TypeOrmModuleOptions => {
+        const databaseUrl = config.get<string>('DATABASE_URL');
+        if (databaseUrl) {
+          return {
+            type: 'postgres',
+            url: databaseUrl,
+            entities: [__dirname + '/**/*.entity{.ts,.js}'],
+            synchronize: true,
+            ssl: { rejectUnauthorized: false },
+          };
+        }
+        return {
+          type: 'postgres',
+          host: config.get<string>('DATABASE_HOST'),
+          port: parseInt(config.get<string>('DATABASE_PORT') ?? '5432', 10),
+          username: config.get<string>('DATABASE_USER'),
+          password: config.get<string>('DATABASE_PASSWORD'),
+          database: config.get<string>('DATABASE_NAME'),
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          synchronize: true,
+        };
+      },
     }),
     ScheduleModule.forRoot(),
-    UsersModule,
     AuthModule,
+    UsersModule,
     OrdersModule,
     NotificationsModule,
     SavedItemsModule,

@@ -44,10 +44,21 @@ export class UsersService {
 
   async updateProfile(
     userId: string,
-    dto: { name?: string; avatarUrl?: string | null },
+    dto: { name?: string; email?: string },
   ): Promise<User> {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     if (!user) throw new NotFoundException('User not found');
+
+    if (dto.email !== undefined && dto.email !== user.email) {
+      const existing = await this.usersRepository.findOne({
+        where: { email: dto.email },
+      });
+      if (existing && existing.id !== userId) {
+        throw new ConflictException('Email already in use');
+      }
+      user.email = dto.email;
+    }
+
     if (dto.name !== undefined) user.name = dto.name;
     return this.usersRepository.save(user);
   }

@@ -17,9 +17,8 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 import { OrdersGateway } from './orders.gateway';
-import { ORDER_EVENTS } from './events/order-events.types';
+import { ORDER_EVENTS, ORDER_STATUS_LABELS } from './events/order-events.types';
 import { NotificationsService } from '../notifications/notifications.service';
-import { ORDER_STATUS_LABELS } from './events/order-events.types';
 
 @Injectable()
 export class OrdersService {
@@ -43,7 +42,6 @@ export class OrdersService {
       throw new BadRequestException('Deadline must be in the future');
     }
 
-    // Транзакция: создаём заказ И сразу делаем создателя участником
     return this.dataSource.transaction(async (manager) => {
       const order = manager.create(Order, {
         ownerId: userId,
@@ -77,9 +75,7 @@ export class OrdersService {
     return order;
   }
 
-  // Списки заказов
   async listForUser(userId: string): Promise<Order[]> {
-    // Заказы, где пользователь — владелец или участник
     return this.ordersRepo
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.participants', 'p')
@@ -106,6 +102,9 @@ export class OrdersService {
       throw new ForbiddenException('Only owner can update the order');
     }
 
+    const statusChanged =
+      dto.status !== undefined && dto.status !== order.status;
+
     if (dto.restaurantName !== undefined) order.restaurantName = dto.restaurantName;
     if (dto.restaurantUrl !== undefined) order.restaurantUrl = dto.restaurantUrl ?? null;
     if (dto.deliveryAddress !== undefined) order.deliveryAddress = dto.deliveryAddress;
@@ -121,8 +120,10 @@ export class OrdersService {
 
     await this.ordersRepo.save(order);
     const full = await this.loadFullOrder(order.id);
+
     this.gateway.emitToOrder(orderId, ORDER_EVENTS.ORDER_UPDATED, { order: full });
-    if (dto.status !== undefined) {
+
+    if (statusChanged && dto.status !== undefined) {
       const participantUserIds = full.participants
         .map((p) => p.userId)
         .filter((id) => id !== userId);
@@ -133,6 +134,7 @@ export class OrdersService {
         data: { orderId: full.id, type: 'status_changed' },
       });
     }
+
     return full;
   }
 
@@ -159,7 +161,6 @@ export class OrdersService {
     if (!existing) {
       const participant = this.participantsRepo.create({ orderId, userId });
       const saved = await this.participantsRepo.save(participant);
-      // Подгружаем с user для отправки клиентам
       const full = await this.participantsRepo.findOne({
         where: { id: saved.id },
         relations: ['user'],
@@ -208,9 +209,11 @@ export class OrdersService {
       where: { id: saved.id },
       relations: ['addedBy'],
     });
+
     if (full) {
       this.gateway.emitToOrder(orderId, ORDER_EVENTS.ITEM_ADDED, { item: full });
     }
+
     if (userId !== order.ownerId) {
       await this.notifications.sendToUsers([order.ownerId], {
         title: order.restaurantName,
@@ -219,6 +222,7 @@ export class OrdersService {
         data: { orderId: order.id, type: 'item_added' },
       });
     }
+
     return full!;
   }
 
@@ -299,7 +303,6 @@ export class OrdersService {
     });
   }
 
-
   // ============== Оплата ==============
   async markAsPaid(orderId: string, userId: string): Promise<OrderParticipant> {
     const participant = await this.participantsRepo.findOne({
@@ -317,7 +320,7 @@ export class OrdersService {
         participant: full,
       });
     }
-    // Уведомляем организатора
+
     const order = await this.ordersRepo.findOne({ where: { id: orderId } });
     if (order && order.ownerId !== userId) {
       await this.notifications.sendToUsers([order.ownerId], {
@@ -327,6 +330,7 @@ export class OrdersService {
         data: { orderId, type: 'payment_marked' },
       });
     }
+
     return saved;
   }
 
@@ -355,7 +359,7 @@ export class OrdersService {
         participant: full,
       });
     }
-    // Уведомляем плательщика
+
     if (participantUserId !== requesterId) {
       await this.notifications.sendToUsers([participantUserId], {
         title: order.restaurantName,
@@ -364,6 +368,7 @@ export class OrdersService {
         data: { orderId, type: 'payment_confirmed' },
       });
     }
+
     return saved;
   }
 

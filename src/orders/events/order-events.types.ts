@@ -31,8 +31,11 @@ export function roomFor(orderId: string): string {
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   [OrderStatus.COLLECTING]: 'Сбор позиций',
+  [OrderStatus.CONFIRMING]: 'Подтверждение',
   [OrderStatus.PREPARING]: 'Готовится',
   [OrderStatus.ON_THE_WAY]: 'В пути',
   [OrderStatus.DELIVERED]: 'Доставлено',
   [OrderStatus.CLOSED]: 'Закрыт',
+  [OrderStatus.CANCELLED]: 'Отменён',
+  [OrderStatus.COMPLAINT]: 'Претензии',
 };

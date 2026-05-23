@@ -71,8 +71,7 @@ export class OrdersDeadlineService {
         category: 'deadline',
         data: { orderId: order.id, type: 'deadline_expired' },
       });
-      // Автоматически переключаем в "Готовится"
-      order.status = OrderStatus.PREPARING;
+      order.status = OrderStatus.CONFIRMING;
       order.deadlineExpiredHandledAt = now;
       await this.ordersRepo.save(order);
       this.logger.log(`Order ${order.id} deadline expired, switched to PREPARING`);

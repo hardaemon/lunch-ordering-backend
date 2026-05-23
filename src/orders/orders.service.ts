@@ -46,7 +46,6 @@ const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
     OrderStatus.CANCELLED,
   ],
   [OrderStatus.COMPLAINT]: [
-    OrderStatus.COLLECTING,
     OrderStatus.CONFIRMING,
     OrderStatus.PREPARING,
     OrderStatus.ON_THE_WAY,

@@ -11,7 +11,6 @@ import { Repository, DataSource } from 'typeorm';
 import { Order } from './entities/order.entity';
 import { OrderParticipant } from './entities/order-participant.entity';
 import { OrderItem } from './entities/order-item.entity';
-import { OrderStatus } from './enums/order-status.enum';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
@@ -19,6 +18,45 @@ import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 import { OrdersGateway } from './orders.gateway';
 import { ORDER_EVENTS, ORDER_STATUS_LABELS } from './events/order-events.types';
 import { NotificationsService } from '../notifications/notifications.service';
+import { OrderStatus } from './enums/order-status.enum';
+
+const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+  [OrderStatus.COLLECTING]: [
+    OrderStatus.CONFIRMING,
+    OrderStatus.CANCELLED,
+  ],
+  [OrderStatus.CONFIRMING]: [
+    OrderStatus.PREPARING,
+    OrderStatus.COMPLAINT,
+    OrderStatus.CANCELLED,
+  ],
+  [OrderStatus.PREPARING]: [
+    OrderStatus.ON_THE_WAY,
+    OrderStatus.COMPLAINT,
+    OrderStatus.CANCELLED,
+  ],
+  [OrderStatus.ON_THE_WAY]: [
+    OrderStatus.DELIVERED,
+    OrderStatus.COMPLAINT,
+    OrderStatus.CANCELLED,
+  ],
+  [OrderStatus.DELIVERED]: [
+    OrderStatus.CLOSED,
+    OrderStatus.COMPLAINT,
+    OrderStatus.CANCELLED,
+  ],
+  [OrderStatus.COMPLAINT]: [
+    OrderStatus.COLLECTING,
+    OrderStatus.CONFIRMING,
+    OrderStatus.PREPARING,
+    OrderStatus.ON_THE_WAY,
+    OrderStatus.DELIVERED,
+    OrderStatus.CLOSED,
+    OrderStatus.CANCELLED,
+  ],
+  [OrderStatus.CLOSED]: [],
+  [OrderStatus.CANCELLED]: [],
+};
 
 @Injectable()
 export class OrdersService {
@@ -102,8 +140,17 @@ export class OrdersService {
       throw new ForbiddenException('Only owner can update the order');
     }
 
-    const statusChanged =
-      dto.status !== undefined && dto.status !== order.status;
+    // Валидация перехода статуса
+    if (dto.status !== undefined && dto.status !== order.status) {
+      const allowed = ALLOWED_TRANSITIONS[order.status] || [];
+      if (!allowed.includes(dto.status)) {
+        throw new BadRequestException(
+          `Переход из «${order.status}» в «${dto.status}» запрещён`,
+        );
+      }
+    }
+
+    const statusChanged = dto.status !== undefined && dto.status !== order.status;
 
     if (dto.restaurantName !== undefined) order.restaurantName = dto.restaurantName;
     if (dto.restaurantUrl !== undefined) order.restaurantUrl = dto.restaurantUrl ?? null;

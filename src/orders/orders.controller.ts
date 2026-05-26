@@ -31,6 +31,9 @@ export class OrdersController {
     @Param('orderId') orderId: string,
     @Res() res: Response,
   ) {
+    const webUrl = process.env.WEB_URL || '';
+    const webLink = webUrl ? `${webUrl}/order/${orderId}` : '';
+
     const html = `
   <!DOCTYPE html>
   <html lang="ru">
@@ -72,6 +75,10 @@ export class OrdersController {
         font-weight: 600;
         margin-bottom: 12px;
       }
+      .btn-secondary {
+        background: #f0f0f0;
+        color: #000;
+      }
       .small { font-size: 13px; color: #999; margin-top: 16px; }
     </style>
   </head>
@@ -80,6 +87,11 @@ export class OrdersController {
       <h1>Приглашение в заказ</h1>
       <p>Вас приглашают присоединиться к совместному заказу.</p>
       <a href="lunchordering://order/${orderId}" class="btn">Открыть в приложении</a>
+      ${
+        webLink
+          ? `<a href="${webLink}" class="btn btn-secondary">Продолжить в браузере</a>`
+          : ''
+      }
       <p class="small">
         Если приложение не открылось — установите Lunch Ordering и попробуйте снова.
       </p>

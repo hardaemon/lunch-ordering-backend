@@ -47,6 +47,8 @@ DATABASE_USER=user
 DATABASE_PASSWORD=password
 DATABASE_NAME=lunch_ordering
 
+WEB_URL=http://localhost:8081
+
 JWT_SECRET=SECRET
 JWT_EXPIRES_IN=7d
 

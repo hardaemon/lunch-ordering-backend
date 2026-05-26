@@ -10,7 +10,7 @@ import {
   UseGuards,
   Res,
 } from '@nestjs/common';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { OrdersService } from './orders.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -58,7 +58,7 @@ export class OrdersController {
   ) {
     return this.ordersService.deleteOrder(id, user.id);
   }
-
+  
   @Get('invite/:orderId')
   async invitePage(
     @Param('orderId') orderId: string,

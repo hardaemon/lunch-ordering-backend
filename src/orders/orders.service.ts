@@ -98,6 +98,8 @@ export class OrdersService {
       const participant = manager.create(OrderParticipant, {
         orderId: saved.id,
         userId,
+        hasPaid: true,
+        paymentConfirmedAt: new Date(),
       });
       await manager.save(participant);
 

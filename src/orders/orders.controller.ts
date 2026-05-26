@@ -9,6 +9,7 @@ import {
   Post,
   UseGuards,
   Res,
+  SetMetadata,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { OrdersService } from './orders.service';
@@ -59,6 +60,7 @@ export class OrdersController {
     return this.ordersService.deleteOrder(id, user.id);
   }
   
+  @SetMetadata('isPublic', true)
   @Get('invite/:orderId')
   async invitePage(
     @Param('orderId') orderId: string,

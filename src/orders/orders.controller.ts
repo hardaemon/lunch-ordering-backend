@@ -114,14 +114,14 @@ export class OrdersController {
     <div class="card">
       <h1>Приглашение в заказ</h1>
       <p>Вас приглашают присоединиться к совместному заказу.</p>
-      <a href="grouporder://order/${orderId}" class="btn">Открыть в приложении</a>
+      <a href="lunchordering://order/${orderId}" class="btn">Открыть в приложении</a>
       <p class="small">
         Если приложение не открылось — установите Lunch Ordering и попробуйте снова.
       </p>
     </div>
     <script>
       setTimeout(() => {
-        window.location.href = 'grouporder://order/${orderId}';
+        window.location.href = 'lunchordering://order/${orderId}';
       }, 300);
     </script>
   </body>

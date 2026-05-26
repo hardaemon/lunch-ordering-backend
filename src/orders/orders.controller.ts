@@ -107,7 +107,6 @@ export class OrdersController {
         font-weight: 600;
         margin-bottom: 12px;
       }
-      .btn-secondary { background: #f0f0f0; color: #000; }
       .small { font-size: 13px; color: #999; margin-top: 16px; }
     </style>
   </head>
@@ -116,14 +115,11 @@ export class OrdersController {
       <h1>Приглашение в заказ</h1>
       <p>Вас приглашают присоединиться к совместному заказу.</p>
       <a href="grouporder://order/${orderId}" class="btn">Открыть в приложении</a>
-      <a href="grouporder://order/${orderId}" class="btn btn-secondary" id="retry">Попробовать снова</a>
       <p class="small">
-        Если приложение не открылось — установите его и попробуйте снова.
-        <br />Ссылка работает только в приложении Group Order.
+        Если приложение не открылось — установите Lunch Ordering и попробуйте снова.
       </p>
     </div>
     <script>
-      // Автоматически пробуем открыть deep link
       setTimeout(() => {
         window.location.href = 'grouporder://order/${orderId}';
       }, 300);

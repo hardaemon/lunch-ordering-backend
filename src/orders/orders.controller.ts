@@ -25,41 +25,6 @@ import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @Get()
-  list(@CurrentUser() user: any) {
-    return this.ordersService.listForUser(user.id);
-  }
-
-  @Post()
-  create(@CurrentUser() user: any, @Body() dto: CreateOrderDto) {
-    return this.ordersService.createOrder(user.id, dto);
-  }
-
-  @Get(':id')
-  getOne(
-    @CurrentUser() user: any,
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ) {
-    return this.ordersService.getOrderById(id, user.id);
-  }
-
-  @Patch(':id')
-  update(
-    @CurrentUser() user: any,
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() dto: UpdateOrderDto,
-  ) {
-    return this.ordersService.updateOrder(id, user.id, dto);
-  }
-
-  @Delete(':id')
-  remove(
-    @CurrentUser() user: any,
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ) {
-    return this.ordersService.deleteOrder(id, user.id);
-  }
-  
   @SetMetadata('isPublic', true)
   @Get('invite/:orderId')
   async invitePage(
@@ -128,6 +93,41 @@ export class OrdersController {
   </html>
     `;
     res.type('text/html').send(html);
+  }
+
+  @Get()
+  list(@CurrentUser() user: any) {
+    return this.ordersService.listForUser(user.id);
+  }
+
+  @Post()
+  create(@CurrentUser() user: any, @Body() dto: CreateOrderDto) {
+    return this.ordersService.createOrder(user.id, dto);
+  }
+
+  @Get(':id')
+  getOne(
+    @CurrentUser() user: any,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return this.ordersService.getOrderById(id, user.id);
+  }
+
+  @Patch(':id')
+  update(
+    @CurrentUser() user: any,
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() dto: UpdateOrderDto,
+  ) {
+    return this.ordersService.updateOrder(id, user.id, dto);
+  }
+
+  @Delete(':id')
+  remove(
+    @CurrentUser() user: any,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return this.ordersService.deleteOrder(id, user.id);
   }
 
   // ===== Присоединение по ссылке =====

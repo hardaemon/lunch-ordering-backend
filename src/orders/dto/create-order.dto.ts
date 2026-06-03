@@ -31,7 +31,6 @@ export class CreateOrderDto {
   @Min(0)
   freeDeliveryThreshold?: number;
 
-  // ISO-строка даты, например "2026-05-12T15:30:00.000Z"
   @IsDateString()
   deadlineAt: string;
 }

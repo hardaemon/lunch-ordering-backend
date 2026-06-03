@@ -21,7 +21,7 @@ import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 
 @Controller('orders')
-@UseGuards(JwtAuthGuard) // все эндпоинты защищены
+@UseGuards(JwtAuthGuard)
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
@@ -142,7 +142,6 @@ export class OrdersController {
     return this.ordersService.deleteOrder(id, user.id);
   }
 
-  // ===== Присоединение по ссылке =====
   @Post(':id/join')
   join(
     @CurrentUser() user: any,
@@ -151,7 +150,6 @@ export class OrdersController {
     return this.ordersService.joinOrder(id, user.id);
   }
 
-  // ===== Позиции =====
   @Post(':id/items')
   addItem(
     @CurrentUser() user: any,
@@ -178,7 +176,6 @@ export class OrdersController {
     return this.ordersService.deleteItem(itemId, user.id);
   }
 
-  // ===== Оплата =====
   @Post(':id/pay')
   markPaid(
     @CurrentUser() user: any,

@@ -12,7 +12,7 @@ import { User } from '../../users/entities/user.entity';
 import { Order } from './order.entity';
 
 @Entity('order_participants')
-@Unique(['orderId', 'userId']) // один user — одна запись в заказе
+@Unique(['orderId', 'userId'])
 export class OrderParticipant {
   @PrimaryGeneratedColumn('uuid')
   id: string;

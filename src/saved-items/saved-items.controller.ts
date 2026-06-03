@@ -26,7 +26,6 @@ import {
 export class SavedItemsController {
   constructor(private readonly service: SavedItemsService) {}
 
-  // ===== Addresses =====
   @Get('addresses')
   listAddresses(@CurrentUser() user: any) {
     return this.service.listAddresses(user.id);
@@ -57,7 +56,6 @@ export class SavedItemsController {
     return this.service.deleteAddress(user.id, id);
   }
 
-  // ===== Restaurants =====
   @Get('restaurants')
   listRestaurants(@CurrentUser() user: any) {
     return this.service.listRestaurants(user.id);

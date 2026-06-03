@@ -15,7 +15,6 @@ export class UsersController {
   async me(@CurrentUser() user: any) {
     const full = await this.usersService.findById(user.id);
     if (!full) return null;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...publicUser } = full;
     return publicUser;
   }
@@ -26,7 +25,6 @@ export class UsersController {
     @Body() dto: UpdateProfileDto,
   ) {
     const updated = await this.usersService.updateProfile(user.id, dto);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...publicUser } = updated;
     return publicUser;
   }
@@ -53,7 +51,6 @@ export class UsersController {
       user.id,
       dto,
     );
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...publicUser } = updated;
     return publicUser;
   }

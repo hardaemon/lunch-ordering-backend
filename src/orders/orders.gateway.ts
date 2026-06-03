@@ -37,7 +37,6 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly ordersService: OrdersService,
   ) {}
 
-  // ============== Подключение / отключение ==============
   async handleConnection(client: Socket) {
     try {
       const token = this.extractToken(client);
@@ -62,7 +61,6 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
-  // ============== Команды от клиента ==============
   @SubscribeMessage('order:subscribe')
   async onSubscribe(
     @ConnectedSocket() client: AuthedSocket,
@@ -71,8 +69,6 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!body?.orderId) {
       throw new WsException('orderId is required');
     }
-    // Проверяем, что этот юзер вообще может смотреть заказ
-    // (getOrderById сам бросит 403/404 если нет доступа)
     try {
       await this.ordersService.getOrderById(body.orderId, client.data.userId);
     } catch (e: any) {
@@ -93,7 +89,6 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return { ok: true };
   }
 
-  // ============== Публичный API для сервиса ==============
   emitToOrder<E extends OrderEventName>(
     orderId: string,
     event: E,
@@ -102,14 +97,11 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(roomFor(orderId)).emit(event, payload);
   }
 
-  // ============== Хелперы ==============
   private extractToken(client: Socket): string | null {
-    // Сначала пробуем auth.token (правильный способ)
     const authToken = client.handshake?.auth?.token;
     if (typeof authToken === 'string' && authToken.length > 0) {
       return authToken;
     }
-    // Запасной вариант — заголовок Authorization
     const header = client.handshake?.headers?.authorization;
     if (typeof header === 'string' && header.startsWith('Bearer ')) {
       return header.slice('Bearer '.length);

@@ -14,7 +14,7 @@ async function bootstrap() {
   );
 
   app.setGlobalPrefix('api');
-  app.enableCors({ origin: '*' });  // для MVP — позже сузить
+  app.enableCors({ origin: '*' });
 
   const port = process.env.PORT || 3000;
   await app.listen(port, '0.0.0.0');

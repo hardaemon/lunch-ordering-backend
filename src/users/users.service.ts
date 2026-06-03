@@ -97,7 +97,6 @@ export class UsersService {
       ? JSON.parse(JSON.stringify(fromDbRaw)) as NotificationPreferences
       : DEFAULT_NOTIFICATION_PREFERENCES;
 
-    // Строим новый объект явно по каждому полю
     const next: NotificationPreferences = {
       statusChanges:
         patch.statusChanges !== undefined

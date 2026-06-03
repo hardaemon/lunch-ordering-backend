@@ -26,7 +26,6 @@ export class NotificationsService {
     private readonly usersService: UsersService,
   ) {}
 
-  // ============== Регистрация / удаление токена ==============
   async registerToken(
     userId: string,
     token: string,
@@ -55,11 +54,9 @@ export class NotificationsService {
     await this.tokensRepo.delete({ userId, token });
   }
 
-  // ============== Отправка пушей ==============
   async sendToUsers(userIds: string[], payload: PushPayload): Promise<void> {
     if (userIds.length === 0) return;
 
-    // Фильтрация по предпочтениям, если указана категория
     let recipients = userIds;
     if (payload.category) {
       const users = await this.usersService.findManyByIds(userIds);

@@ -42,7 +42,7 @@ export class OrderItem {
   quantity: number;
 
   @Column({ type: 'boolean', default: false })
-  isOrdered: boolean; // отметка "заказано" (организатор отмечает)
+  isOrdered: boolean;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;

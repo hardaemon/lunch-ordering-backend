@@ -72,7 +72,6 @@ export class OrdersService {
     private readonly notifications: NotificationsService,
   ) {}
 
-  // ============== Создание заказа ==============
   async createOrder(userId: string, dto: CreateOrderDto): Promise<Order> {
     const deadline = new Date(dto.deadlineAt);
     if (deadline.getTime() <= Date.now()) {
@@ -107,7 +106,6 @@ export class OrdersService {
     });
   }
 
-  // ============== Получение заказа ==============
   async getOrderById(orderId: string, userId: string): Promise<Order> {
     const order = await this.loadFullOrder(orderId);
     await this.ensureCanView(order, userId);
@@ -129,7 +127,6 @@ export class OrdersService {
       .getMany();
   }
 
-  // ============== Обновление заказа ==============
   async updateOrder(
     orderId: string,
     userId: string,
@@ -141,7 +138,6 @@ export class OrdersService {
       throw new ForbiddenException('Only owner can update the order');
     }
 
-    // Валидация перехода статуса
     if (dto.status !== undefined && dto.status !== order.status) {
       const allowed = ALLOWED_TRANSITIONS[order.status] || [];
       if (!allowed.includes(dto.status)) {
@@ -195,7 +191,6 @@ export class OrdersService {
     await this.ordersRepo.remove(order);
   }
 
-  // ============== Присоединение к заказу ==============
   async joinOrder(orderId: string, userId: string): Promise<Order> {
     const order = await this.ordersRepo.findOne({ where: { id: orderId } });
     if (!order) throw new NotFoundException('Order not found');
@@ -223,7 +218,6 @@ export class OrdersService {
     return this.loadFullOrder(orderId);
   }
 
-  // ============== Позиции ==============
   async addItem(
     orderId: string,
     userId: string,
@@ -351,7 +345,6 @@ export class OrdersService {
     });
   }
 
-  // ============== Оплата ==============
   async markAsPaid(orderId: string, userId: string): Promise<OrderParticipant> {
     const participant = await this.participantsRepo.findOne({
       where: { orderId, userId },
@@ -420,7 +413,6 @@ export class OrdersService {
     return saved;
   }
 
-  // ============== Хелперы ==============
   private async loadFullOrder(orderId: string, manager?: any): Promise<Order> {
     const repo = manager ? manager.getRepository(Order) : this.ordersRepo;
     const order = await repo.findOne({

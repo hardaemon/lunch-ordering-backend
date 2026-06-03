@@ -25,7 +25,6 @@ export class SavedItemsService {
     private readonly restaurantsRepo: Repository<SavedRestaurant>,
   ) {}
 
-  // ============== Addresses ==============
   listAddresses(userId: string) {
     return this.addressesRepo.find({
       where: { userId },
@@ -57,7 +56,6 @@ export class SavedItemsService {
     await this.addressesRepo.remove(entity);
   }
 
-  // ============== Restaurants ==============
   listRestaurants(userId: string) {
     return this.restaurantsRepo.find({
       where: { userId },

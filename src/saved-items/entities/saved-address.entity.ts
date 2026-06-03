@@ -23,11 +23,9 @@ export class SavedAddress {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  // Короткое имя, например "Дом" или "Офис"
   @Column()
   label: string;
 
-  // Полный адрес
   @Column()
   address: string;
 

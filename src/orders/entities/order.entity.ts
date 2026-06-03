@@ -37,7 +37,7 @@ export class Order {
   deliveryAddress: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
-  deliveryCost: string; // TypeORM возвращает decimal как string
+  deliveryCost: string;
 
   @Column({
     type: 'decimal',

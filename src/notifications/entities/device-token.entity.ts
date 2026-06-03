@@ -28,7 +28,6 @@ export class DeviceToken {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  // Expo Push Token: 'ExponentPushToken[...]'
   @Index({ unique: true })
   @Column()
   token: string;

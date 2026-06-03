@@ -16,14 +16,12 @@ export class OrdersDeadlineService {
     private readonly notifications: NotificationsService,
   ) {}
 
-  // Каждую минуту проверяем дедлайны
   @Cron(CronExpression.EVERY_MINUTE)
   async tick() {
     await this.sendUpcomingReminders();
     await this.handleExpired();
   }
 
-  // Заказы, у которых дедлайн в ближайшие 5 минут и напоминание ещё не отправлено
   private async sendUpcomingReminders() {
     const now = new Date();
     const in5Min = new Date(now.getTime() + 5 * 60 * 1000);
@@ -51,7 +49,6 @@ export class OrdersDeadlineService {
     }
   }
 
-  // Истёкшие дедлайны — уведомляем и закрываем сбор
   private async handleExpired() {
     const now = new Date();
     const orders = await this.ordersRepo.find({

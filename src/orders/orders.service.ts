@@ -346,6 +346,14 @@ export class OrdersService {
   }
 
   async markAsPaid(orderId: string, userId: string): Promise<OrderParticipant> {
+    const order = await this.ordersRepo.findOne({ where: { id: orderId } });
+    if (!order) throw new NotFoundException('Order not found');
+    if (order.status === OrderStatus.COLLECTING) {
+      throw new BadRequestException(
+        'Оплата возможна только после закрытия сбора позиций',
+      );
+    }
+
     const participant = await this.participantsRepo.findOne({
       where: { orderId, userId },
     });
@@ -362,8 +370,7 @@ export class OrdersService {
       });
     }
 
-    const order = await this.ordersRepo.findOne({ where: { id: orderId } });
-    if (order && order.ownerId !== userId) {
+    if (order.ownerId !== userId) {
       await this.notifications.sendToUsers([order.ownerId], {
         title: order.restaurantName,
         body: `${full?.user?.name ?? 'Участник'} отметил(а) оплату`,
